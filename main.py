@@ -27,7 +27,7 @@ df_diurno = pd.DataFrame(data_diurno)
 df_noturno = pd.DataFrame(data_noturno)
 
 # Configuração do Streamlit
-st.title("📊 Desempenho Escolar 2024")
+st.title("📊 Desempenho CETI 2024")
 st.markdown("---")
 
 # Seleção do turno
