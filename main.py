@@ -122,7 +122,7 @@ ax3.pie(
     startangle=90,
     textprops={'fontsize': 10}
 )
-ax3.set_title("Proporção de Retenção vs Desistência", fontsize=12)
+ax3.set_title("Proporção de Permanência(matriculados) vs Desistência", fontsize=12)
 
 # --- Renderização no Streamlit ---
 st.markdown("---")
