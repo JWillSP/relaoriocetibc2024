@@ -8,8 +8,9 @@ st.set_page_config(layout="wide")
 with st.expander("⚙️ Dados", expanded=False):
     col1, col2 = st.columns(2)
     with col1:
-        uploaded = st.file_uploader("Restaurar backup", type="pkl", label_visibility="collapsed")
-        if uploaded:
+        uploaded = st.file_uploader("Restaurar backup", type="pkl", label_visibility="collapsed", key="pkl_upload")
+        if uploaded and st.session_state.get("last_upload") != uploaded.name:
+            st.session_state.last_upload = uploaded.name
             st.session_state.data = pd.read_pickle(uploaded)
             with open("data_pickle.pkl", "wb") as f:
                 f.write(uploaded.getvalue())
@@ -54,7 +55,7 @@ if not turno: st.stop()
 
 chave = turnos[turno]
 df = st.session_state.data[chave].set_index(idx_cols[chave])
-df_edited = st.data_editor(df)
+df_edited = st.data_editor(df, key=f"editor_{chave}")
 
 if not df_edited.equals(df):
     st.session_state.data[chave] = df_edited.reset_index()
@@ -77,7 +78,8 @@ with tab1:
                   orientation="h", color_discrete_sequence=cores, text_auto=True)
     fig1.update_layout(showlegend=False, height=350, margin=dict(l=0,r=0,t=60,b=0), 
                        title=dict(text=f"Distribuição - {serie}", font=dict(size=28)),
-                       yaxis=dict(tickfont=dict(size=22)))
+                       yaxis=dict(tickfont=dict(size=22), title=None),
+                       xaxis=dict(visible=False))
     fig1.update_traces(textfont_size=24)
     st.plotly_chart(fig1, use_container_width=True)
 
