@@ -23,17 +23,7 @@ with st.expander("⚙️ Dados", expanded=False):
         except FileNotFoundError:
             st.caption("Nenhum dado salvo ainda")
 
-# Dados
-data_diurno = {
-    "SÉRIE": ["TOTAL DE ALUNOS MATRICULADOS", "APROVADOS", "APROVADOS COM RPP", "REPROVADOS", "DESISTENTES", "ABANDONO"],
-    "1ºAno": [241, 157, 83, 1, 11, 0], "2ºAno": [181, 92, 86, 3, 14, 0],
-    "RFM SEG. IV (1ºSÉRIE - 2ºSÉRIE)": [63, 55, 0, 0, 8, 0],
-    "RFM SEG. V (2ºSÉRIE - 3ºSÉRIE)": [24, 21, 0, 3, 14, 0], "3ºSÉRIE": [160, 160, 0, 0, 6, 0]
-}
-data_noturno = {
-    "SÉRIE": ["TOTAL DE ALUNOS MATRICULADOS", "APROVADOS", "APROVADOS COM RPP", "REPROVADOS", "DESISTENTES", "ABANDONO"],
-    "TJ6": [70, 58, 0, 12, 33, 0], "TF6": [69, 65, 0, 4, 132, 0], "TF7": [165, 158, 0, 7, 52, 0], "TJ7": [140, 120, 0, 10, 30, 0]
-}
+
 
 # Carregar/salvar dados
 if "data" not in st.session_state:
