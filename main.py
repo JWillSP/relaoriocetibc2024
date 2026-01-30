@@ -26,9 +26,9 @@ with st.expander("⚙️ Dados", expanded=False):
 # Dados
 data_diurno = {
     "SÉRIE": ["TOTAL DE ALUNOS MATRICULADOS", "APROVADOS", "APROVADOS COM RPP", "REPROVADOS", "DESISTENTES", "ABANDONO"],
-    "1? Ano": [241, 157, 83, 1, 11, 0], "2? Ano": [181, 92, 86, 3, 14, 0],
-    "RFM SEG. IV (1? SÉRIE - 2? SÉRIE)": [63, 55, 0, 0, 8, 0],
-    "RFM SEG. V (2? SÉRIE - 3? SÉRIE)": [24, 21, 0, 3, 14, 0], "3? SÉRIE": [160, 160, 0, 0, 6, 0]
+    "1ºAno": [241, 157, 83, 1, 11, 0], "2ºAno": [181, 92, 86, 3, 14, 0],
+    "RFM SEG. IV (1ºSÉRIE - 2ºSÉRIE)": [63, 55, 0, 0, 8, 0],
+    "RFM SEG. V (2ºSÉRIE - 3ºSÉRIE)": [24, 21, 0, 3, 14, 0], "3ºSÉRIE": [160, 160, 0, 0, 6, 0]
 }
 data_noturno = {
     "SÉRIE": ["TOTAL DE ALUNOS MATRICULADOS", "APROVADOS", "APROVADOS COM RPP", "REPROVADOS", "DESISTENTES", "ABANDONO"],
