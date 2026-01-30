@@ -25,18 +25,14 @@ with st.expander("⚙️ Dados", expanded=False):
 
 # Dados
 data_diurno = {
-    "SÉRIE": ["APROVADOS", "APROVADOS COM RPP", "REPROVADOS", "DESISTENTES", "TOTAL DE ALUNOS MATRICULADOS"],
-    "1º Ano": [157, 83, 1, 11, 241], "2º Ano": [92, 86, 3, 14, 181],
-    "RFM SEG. IV (1ª SÉRIE - 2ª SÉRIE)": [55, 0, 0, 8, 63],
-    "RFM SEG. V (2ª SÉRIE - 3ª SÉRIE)": [21, 0, 3, 14, 24], "3ª SÉRIE": [160, 0, 0, 6, 160]
+    "SÉRIE": ["TOTAL DE ALUNOS MATRICULADOS", "APROVADOS", "APROVADOS COM RPP", "REPROVADOS", "DESISTENTES", "ABANDONO"],
+    "1? Ano": [241, 157, 83, 1, 11, 0], "2? Ano": [181, 92, 86, 3, 14, 0],
+    "RFM SEG. IV (1? SÉRIE - 2? SÉRIE)": [63, 55, 0, 0, 8, 0],
+    "RFM SEG. V (2? SÉRIE - 3? SÉRIE)": [24, 21, 0, 3, 14, 0], "3? SÉRIE": [160, 160, 0, 0, 6, 0]
 }
 data_noturno = {
-    "SÉRIE": ["APROVADOS", "APROVADOS COM RPP", "REPROVADOS", "DESISTENTES", "TOTAL DE ALUNOS MATRICULADOS"],
-    "TJ6": [58, 0, 12, 33, 70], "TF6": [65, 0, 4, 132, 69], "TF7": [158, 0, 7, 52, 165], "TJ7": [120, 0, 10, 30, 140]
-}
-data_area = {
-    "Área do Conhecimento": ["APROVADOS", "APROVADOS COM RPP", "REPROVADOS", "DESISTENTES", "TOTAL DE ALUNOS MATRICULADOS"],
-    "Linguagens": [0]*5, "Matemática": [0]*5, "Ciências da Natureza": [0]*5, "Ciências Humanas": [0]*5
+    "SÉRIE": ["TOTAL DE ALUNOS MATRICULADOS", "APROVADOS", "APROVADOS COM RPP", "REPROVADOS", "DESISTENTES", "ABANDONO"],
+    "TJ6": [70, 58, 0, 12, 33, 0], "TF6": [69, 65, 0, 4, 132, 0], "TF7": [165, 158, 0, 7, 52, 0], "TJ7": [140, 120, 0, 10, 30, 0]
 }
 
 # Carregar/salvar dados
@@ -44,10 +40,11 @@ if "data" not in st.session_state:
     try:
         st.session_state.data = pd.read_pickle("data_pickle.pkl")
     except FileNotFoundError:
-        st.session_state.data = {"diurno": pd.DataFrame(data_diurno), "noturno": pd.DataFrame(data_noturno), "area_do_conhecimento": pd.DataFrame(data_area)}
+        st.session_state.data = {"diurno": pd.DataFrame(data_diurno), "noturno": pd.DataFrame(data_noturno)}
 
-turnos = {"Diurno": "diurno", "Noturno": "noturno", "Área do Conhecimento": "area_do_conhecimento"}
-idx_cols = {"diurno": "SÉRIE", "noturno": "SÉRIE", "area_do_conhecimento": "Área do Conhecimento"}
+turnos = {"Diurno": "diurno", "Noturno": "noturno"}
+idx_cols = {"diurno": "SÉRIE", "noturno": "SÉRIE"}
+
 
 st.title("📊 Desempenho CETI 2025")
 turno = st.segmented_control("Recorte:", list(turnos.keys()))
@@ -55,6 +52,12 @@ if not turno: st.stop()
 
 chave = turnos[turno]
 df = st.session_state.data[chave].set_index(idx_cols[chave])
+
+ordem_linhas = ["TOTAL DE ALUNOS MATRICULADOS", "APROVADOS", "APROVADOS COM RPP", "REPROVADOS", "DESISTENTES", "ABANDONO"]
+for linha in ordem_linhas:
+    if linha not in df.index:
+        df.loc[linha] = 0
+df = df.reindex(ordem_linhas)
 df_edited = st.data_editor(df, key=f"editor_{chave}")
 
 if not df_edited.equals(df):
@@ -67,25 +70,37 @@ if not serie or df[serie].sum() == 0:
     st.warning("Selecione uma série com dados.") if serie else None
     st.stop()
 
-aprov, rpp, reprov, desist, matric = df[serie].tolist()
-cores = ["#2e7d32", "#81c784", "#d32f2f", "#607d8b", "#1976d2"]
+valores = df[serie]
+matric = valores.get("TOTAL DE ALUNOS MATRICULADOS", 0)
+aprov = valores.get("APROVADOS", 0)
+rpp = valores.get("APROVADOS COM RPP", 0)
+reprov = valores.get("REPROVADOS", 0)
+desist = valores.get("DESISTENTES", 0)
+aband = valores.get("ABANDONO", 0)
+cores = ["#1976d2", "#2e7d32", "#81c784", "#d32f2f", "#607d8b", "#8e24aa"]
 
 # Gráficos em tabs (fontes grandes para projeção)
 tab1, tab2, tab3 = st.tabs(["Gráfico 1", "Gráfico 2", "Gráfico 3"])
 
 with tab1:
-    fig1 = px.bar(x=[aprov, rpp, reprov, matric], y=["Aprovados", "com RPP", "Reprovados", "Matriculados"], 
+    fig1 = px.bar(x=[matric, aprov, rpp, reprov, desist, aband], y=["Matriculados", "Aprovados", "com RPP", "Reprovados", "Desistentes", "Abandono"],
                   orientation="h", color_discrete_sequence=cores, text_auto=True)
     fig1.update_layout(showlegend=False, height=350, margin=dict(l=0,r=0,t=60,b=0), 
                        title=dict(text=f"Distribuição - {serie}", font=dict(size=28)),
-                       yaxis=dict(tickfont=dict(size=22), title=None),
+                       yaxis=dict(
+                           tickfont=dict(size=22),
+                           title=None,
+                           categoryorder="array",
+                           categoryarray=["Matriculados", "Aprovados", "com RPP", "Reprovados", "Desistentes", "Abandono"],
+                           autorange="reversed",
+                       ),
                        xaxis=dict(visible=False))
     fig1.update_traces(textfont_size=24)
     st.plotly_chart(fig1, use_container_width=True)
 
 with tab2:
     fig2 = px.pie(values=[aprov, rpp, reprov], names=["Aprovados", "com RPP", "Reprovados"], 
-                  color_discrete_sequence=cores[:3], hole=0.3)
+                  color_discrete_sequence=cores[1:4], hole=0.3)
     fig2.update_layout(height=500, margin=dict(l=0,r=0,t=60,b=0), 
                        title=dict(text="Resultados Finais", font=dict(size=28)),
                        legend=dict(font=dict(size=20)))
@@ -93,8 +108,8 @@ with tab2:
     st.plotly_chart(fig2, use_container_width=True)
 
 with tab3:
-    fig3 = px.pie(values=[matric, desist], names=["Matriculados", "Desistentes"], 
-                  color_discrete_sequence=[cores[4], cores[3]], hole=0.3)
+    fig3 = px.pie(values=[matric, desist, aband], names=["Matriculados", "Desistentes", "Abandono"],
+                  color_discrete_sequence=[cores[0], cores[4], cores[5]], hole=0.3)
     fig3.update_layout(height=500, margin=dict(l=0,r=0,t=60,b=0), 
                        title=dict(text="Permanência", font=dict(size=28)),
                        legend=dict(font=dict(size=20)))
